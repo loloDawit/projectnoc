@@ -5,10 +5,11 @@ const Store = require('../models/Store');
 // @access      Public
 exports.getStores = async (req, res, next) => {
   try {
-    const store = await Store.find();
+    const stores = await Store.find();
+
     res.status(200).json({
       success: true,
-      data: store
+      data: stores
     });
   } catch (error) {
     res.status(400).json({
@@ -20,8 +21,24 @@ exports.getStores = async (req, res, next) => {
 // @desc        Get a Single Store
 // @route       Get /api/v1/stores/:id
 // @access      Public
-exports.getStore = (req, res, next) => {
-  res.status(200).json({ success: true, msg: `Show store ${req.params.id}` });
+exports.getStore = async (req, res, next) => {
+  try {
+    const store = await Store.findById(req.params.id);
+    if (!store) {
+      return res.status(400).json({
+        success: false,
+        Error: `${req.params.id}` + ' is not a valid store ID'
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: store
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false
+    });
+  }
 };
 
 // @desc        Create new Store
