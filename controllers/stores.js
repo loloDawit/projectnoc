@@ -3,8 +3,18 @@ const Store = require('../models/Store');
 // @desc        Get all Stores
 // @route       Get /api/v1/stores
 // @access      Public
-exports.getStores = (req, res, next) => {
-  res.status(200).json({ success: true, msg: 'Show all stores' });
+exports.getStores = async (req, res, next) => {
+  try {
+    const store = await Store.find();
+    res.status(200).json({
+      success: true,
+      data: store
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false
+    });
+  }
 };
 
 // @desc        Get a Single Store
