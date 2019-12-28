@@ -11,7 +11,7 @@ const StoreSchema = new mongoose.Schema({
   slug: String,
   description: {
     type: String,
-    required: [true, 'Please add a name'],
+    required: [true, 'Please add a store description'],
     maxlength: [500, 'Discription can not be more than 500 characters']
   },
   website: {
@@ -34,7 +34,7 @@ const StoreSchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    required: [true, 'Please add address']
+    required: [true, 'Please add an address']
   },
   location: {
     type: {
