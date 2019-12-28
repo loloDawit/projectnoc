@@ -9,6 +9,7 @@ exports.getStores = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
+      total_stores: stores.length,
       data: stores
     });
   } catch (error) {
