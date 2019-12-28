@@ -6,7 +6,35 @@ const geocoder = require('../utils/geocoder');
 // @route       Get /api/v1/stores
 // @access      Public
 exports.getStores = asyncHandler(async (req, res, next) => {
-  const stores = await Store.find();
+  const reqQuery = { ...req.query };
+  let query;
+
+  const removeFields = ['select', 'sort'];
+  removeFields.forEach(param => {
+    delete reqQuery[param];
+  });
+  let queryString = JSON.stringify(reqQuery);
+  queryString = queryString.replace(
+    /\b(gt|gte|lt|lte|in)\b/g,
+    match => `$${match}`
+  );
+
+  query = Store.find(JSON.parse(queryString));
+  // SELECT fields
+  if (req.query.select) {
+    // query select takes the values with space
+    const fields = req.query.select.split(',').join(' ');
+    query = query.select(fields);
+  }
+  // Sort
+  if(req.query.sort){
+    const sortBy = req.query.select.split(',').join(' ');
+    query = query.sort(sortBy);
+  }else{
+    query = query.sort('-establishedat');
+  }
+  // Excute query
+  const stores = await query;
 
   res.status(200).json({
     success: true,
