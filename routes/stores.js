@@ -4,10 +4,12 @@ const {
   getStores,
   updateStore,
   createStore,
-  deleteStore
+  deleteStore,
+  getStoreByRadius
 } = require('../controllers/stores');
 const router = express.Router();
 
+router.route('/radius/:zipcode/:distance').get(getStoreByRadius);
 router
   .route('/')
   .get(getStores)
