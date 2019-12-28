@@ -2,22 +2,22 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
-const colors = require('colors')
+const colors = require('colors');
+// Load ENV Variables
+dotenv.config({ path: './config/config.env' });
 // Middleware
-const errorHandler = require('./middleware/error')
+const errorHandler = require('./middleware/error');
 // Router files
 const stores = require('./routes/stores');
 
 const connectDB = require('./config/db');
 
-// Load ENV Variables
-dotenv.config({ path: './config/config.env' });
 // Connect to database
 connectDB();
 
 const app = express();
 // Body parser
-app.use(express.json())
+app.use(express.json());
 
 // Development envi logging middleware
 if (process.env.NODE_ENV === 'development') {
@@ -28,11 +28,13 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/v1/stores', stores);
 const PORT = process.env.PORT;
 
-app.use(errorHandler); 
+app.use(errorHandler);
 
 const server = app.listen(
   PORT,
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold)
+  console.log(
+    `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold
+  )
 );
 
 // Handle all promise rejections
