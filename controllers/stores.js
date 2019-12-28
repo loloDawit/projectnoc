@@ -9,7 +9,7 @@ exports.getStores = asyncHandler(async (req, res, next) => {
   const reqQuery = { ...req.query };
   let query;
 
-  const removeFields = ['select', 'sort'];
+  const removeFields = ['select', 'sort', 'page', 'limit'];
   removeFields.forEach(param => {
     delete reqQuery[param];
   });
@@ -26,19 +26,42 @@ exports.getStores = asyncHandler(async (req, res, next) => {
     const fields = req.query.select.split(',').join(' ');
     query = query.select(fields);
   }
-  // Sort
-  if(req.query.sort){
+  // SORT query by
+  if (req.query.sort) {
     const sortBy = req.query.select.split(',').join(' ');
     query = query.sort(sortBy);
-  }else{
+  } else {
     query = query.sort('-establishedat');
   }
-  // Excute query
-  const stores = await query;
+  // Add pagination
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 20;
+  const _index = (page - 1) * limit;
+  const _endIndex = page * limit;
+  const _total = await Store.countDocuments();
 
+  query = query.skip(_index).limit(limit);
+
+  /**              Execute Query              */
+  const stores = await query;
+  // Pagination result
+  const pagination = {};
+  if (_endIndex < _total) {
+    pagination.next = {
+      page: page + 1,
+      limit
+    };
+  }
+  if (_index > 0) {
+    pagination.prev = {
+      page: page - 1,
+      limit
+    };
+  }
   res.status(200).json({
     success: true,
     total_stores: stores.length,
+    pagination,
     data: stores
   });
 });
