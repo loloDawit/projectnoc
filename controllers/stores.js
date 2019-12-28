@@ -1,4 +1,5 @@
 const Store = require('../models/Store');
+const ErrorResponse = require('../utils/errorResponse');
 
 // @desc        Get all Stores
 // @route       Get /api/v1/stores
@@ -13,9 +14,7 @@ exports.getStores = async (req, res, next) => {
       data: stores
     });
   } catch (error) {
-    res.status(400).json({
-      success: false
-    });
+    next(error);
   }
 };
 
@@ -26,19 +25,19 @@ exports.getStore = async (req, res, next) => {
   try {
     const store = await Store.findById(req.params.id);
     if (!store) {
-      return res.status(400).json({
-        success: false,
-        Error: `${req.params.id}` + ' is not a valid store ID'
-      });
+      return next(
+        new ErrorResponse(
+          `Store not found with the id of ${req.params.id}`,
+          404
+        )
+      );
     }
     res.status(200).json({
       success: true,
       data: store
     });
   } catch (error) {
-    res.status(400).json({
-      success: false
-    });
+    next(error);
   }
 };
 
@@ -54,9 +53,7 @@ exports.createStore = async (req, res, next) => {
       data: store
     });
   } catch (error) {
-    res.status(400).json({
-      success: false
-    });
+    next(error);
   }
 };
 
@@ -70,19 +67,19 @@ exports.updateStore = async (req, res, next) => {
       runValidators: true
     });
     if (!store) {
-      return res.status(400).json({
-        success: false,
-        Error: `${req.params.id}` + ' is not a valid store ID'
-      });
+      return next(
+        new ErrorResponse(
+          `Store not found with the id of ${req.params.id}`,
+          404
+        )
+      );
     }
     res.status(200).json({
       success: true,
       data: store
     });
   } catch (error) {
-    res.status(400).json({
-      success: false
-    });
+    next(error);
   }
 };
 
@@ -93,18 +90,18 @@ exports.deleteStore = async (req, res, next) => {
   try {
     const store = await Store.findByIdAndDelete(req.params.id);
     if (!store) {
-      return res.status(400).json({
-        success: false,
-        Error: `${req.params.id}` + ' is not a valid store ID'
-      });
+      return next(
+        new ErrorResponse(
+          `Store not found with the id of ${req.params.id}`,
+          404
+        )
+      );
     }
     res.status(200).json({
       success: true,
       data: {}
     });
   } catch (error) {
-    res.status(400).json({
-      success: false
-    });
+    next(error);
   }
 };
