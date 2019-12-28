@@ -79,7 +79,7 @@ const StoreSchema = new mongoose.Schema({
     type: String,
     default: 'no-photo.jpg'
   },
-  establishedat: {
+  createdAt: {
     type: Date,
     default: Date.now
   },
