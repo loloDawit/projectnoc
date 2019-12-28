@@ -62,17 +62,48 @@ exports.createStore = async (req, res, next) => {
 // @desc        Upadte a  Store
 // @route       PUT /api/v1/stores/:id
 // @access      Private
-exports.updateStore = (req, res, next) => {
-  res
-    .status(200)
-    .json({ success: true, msg: `Updated store ${req.params.id}` });
+exports.updateStore = async (req, res, next) => {
+  try {
+    const store = await Store.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
+    if (!store) {
+      return res.status(400).json({
+        success: false,
+        Error: `${req.params.id}` + ' is not a valid store ID'
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: store
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false
+    });
+  }
 };
 
 // @desc        Delete a  Store
 // @route       DELETE /api/v1/stores/:id
 // @access      Private
-exports.deleteStore = (req, res, next) => {
-  res
-    .status(200)
-    .json({ success: true, msg: `Deleted store ${req.params.id}` });
+exports.deleteStore = async (req, res, next) => {
+  try {
+    const store = await Store.findByIdAndDelete(req.params.id);
+    if (!store) {
+      return res.status(400).json({
+        success: false,
+        Error: `${req.params.id}` + ' is not a valid store ID'
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: {}
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false
+    });
+  }
 };
