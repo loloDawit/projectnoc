@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
+const geocoder = require('../utils/geocoder');
 
 const StoreSchema = new mongoose.Schema({
   name: {
@@ -86,5 +88,27 @@ const StoreSchema = new mongoose.Schema({
     default: false
   }
 });
+/** Creat a Store Slug from the name */
+StoreSchema.pre('save', function(next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
 
+/** Geocode and Create location field */
+StoreSchema.pre('save', async function(next) {
+  const _location = await geocoder.geocode(this.address);
+  this.location = {
+    type: 'Point',
+    coordinates: [_location[0].longitude, _location[0].latitude],
+    formattedAddress: _location[0].formattedAddress,
+    street: _location[0].streetName,
+    city: _location[0].city,
+    state: _location[0].stateCode,
+    zipcode: _location[0].zipcode,
+    country: _location[0].countryCode
+  };
+  // We have the address geocoded, no need to save the address in the database
+  this.address = undefined;
+  next();
+});
 module.exports = mongoose.model('Store', StoreSchema);
