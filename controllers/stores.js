@@ -1,7 +1,7 @@
 const Store = require('../models/Store');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-
+const geocoder = require('../utils/geocoder');
 // @desc        Get all Stores
 // @route       Get /api/v1/stores
 // @access      Public
@@ -75,5 +75,37 @@ exports.deleteStore = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: {}
+  });
+});
+
+// @desc        Get a Store within a radius
+// @route       GET /api/v1/stores/radius/:zipcode/:id
+// @access      Private
+exports.getStoreByRadius = asyncHandler(async (req, res, next) => {
+  const { zipcode, distance } = req.params;
+  // Get the latitude and longitude from the geocoder
+  const location = await geocoder.geocode(zipcode);
+  const latitude = location[0].latitude;
+  const longitude = location[0].longitude;
+
+  // Calculate the radius
+  // Earth Radius = 3,963 miles
+  const radius = distance / 3963;
+
+  const stores = await Store.find({
+    location: { $geoWithin: { $centerSphere: [[longitude, latitude], radius] } }
+  });
+  if (!stores) {
+    return next(
+      new ErrorResponse(
+        `Store not found with the id of ${req.params.zipcode}`,
+        404
+      )
+    );
+  }
+  res.status(200).json({
+    success: true,
+    total_stores: stores.length,
+    data: stores
   });
 });
