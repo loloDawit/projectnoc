@@ -2,9 +2,13 @@ const Store = require('../models/Store');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const geocoder = require('../utils/geocoder');
-// @desc        Get all Stores
-// @route       Get /api/v1/stores
-// @access      Public
+/**
+ *   getStores
+ * 
+ * * Description Get all Stores
+ * * Route       Get /api/v1/stores
+ * * Access      Public 
+ */
 exports.getStores = asyncHandler(async (req, res, next) => {
   const reqQuery = { ...req.query };
   let query;
@@ -19,7 +23,10 @@ exports.getStores = asyncHandler(async (req, res, next) => {
     match => `$${match}`
   );
 
-  query = Store.find(JSON.parse(queryString));
+  query = Store.find(JSON.parse(queryString)).populate({
+    path: 'projects',
+    select: 'title description budget createdAt'
+  });
   // SELECT fields
   if (req.query.select) {
     // query select takes the values with space
@@ -117,12 +124,13 @@ exports.updateStore = asyncHandler(async (req, res, next) => {
 // @route       DELETE /api/v1/stores/:id
 // @access      Private
 exports.deleteStore = asyncHandler(async (req, res, next) => {
-  const store = await Store.findByIdAndDelete(req.params.id);
+  const store = await Store.findById(req.params.id);
   if (!store) {
     return next(
       new ErrorResponse(`Store not found with the id of ${req.params.id}`, 404)
     );
   }
+  store.remove();
   res.status(200).json({
     success: true,
     data: {}
