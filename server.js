@@ -9,7 +9,7 @@ dotenv.config({ path: './config/config.env' });
 const errorHandler = require('./middleware/error');
 // Router files
 const stores = require('./routes/stores');
-
+const projects = require('./routes/projects');
 const connectDB = require('./config/db');
 
 // Connect to database
@@ -26,6 +26,8 @@ if (process.env.NODE_ENV === 'development') {
 
 // Mount routers
 app.use('/api/v1/stores', stores);
+app.use('/api/v1/projects', projects);
+
 const PORT = process.env.PORT;
 
 app.use(errorHandler);
