@@ -1,4 +1,5 @@
 const Project = require('../models/Project');
+const Store = require('../models/Store');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
@@ -36,15 +37,16 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
  * * Access      Public
  */
 exports.getProject = asyncHandler(async (req, res, next) => {
-  console.log(req.params.id);
-
   const project = await Project.findById(req.params.id).populate({
     path: 'store',
     select: 'name description'
   });
   if (!project) {
     return next(
-      ErrorResponse(`Project not found with the id of ${req.params.id}`, 404)
+      new ErrorResponse(
+        `Project not found with the id of ${req.params.id}`,
+        404
+      )
     );
   }
   res.status(200).json({
@@ -56,10 +58,20 @@ exports.getProject = asyncHandler(async (req, res, next) => {
  **  createProject
  *
  * * Description Create a new Project
- * * Route       POST /api/v1/project
+ * * Route       POST /api/v1/stores/:storeId/projects
  * * Access      Private
  */
 exports.createProject = asyncHandler(async (req, res, next) => {
+  req.body.store = req.params.storeId;
+  const store = await Store.findById(req.params.storeId);
+  if (!store) {
+    return next(
+      new ErrorResponse(
+        `Store not found with an id of ${req.params.storeId}`,
+        404
+      )
+    );
+  }
   const project = await Project.create(req.body);
 
   res.status(200).json({
@@ -67,6 +79,44 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     data: project
   });
 });
-// @desc        Get a Single Project
-// @route       Get /api/v1/stores/:id
-// @access      Public
+/**
+ **  updateProject
+ *
+ * * Description Update a Project details using the project id
+ * * Route       PUT /api/v1/project/:id
+ * * Access      Private
+ */
+exports.updateProject = asyncHandler(async (req, res, next) => {
+  const project = await Project.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
+  if (!project) {
+    return next(
+      new ErrorResponse(`Project not found with an id of ${req.params.id}`, 404)
+    );
+  }
+  res.status(200).json({
+    success: true,
+    data: project
+  });
+});
+/**
+ **  deleteProject
+ *
+ * * Description Delete a Project using the project id
+ * * Route       PUT /api/v1/project/:id
+ * * Access      Private
+ */
+exports.deleteProject = asyncHandler(async (req, res, next) => {
+  const project = await Project.findByIdAndDelete(req.params.id);
+  if (!project) {
+    return next(
+      new ErrorResponse(`Project not found with an id of ${req.params.id}`, 404)
+    );
+  }
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});
