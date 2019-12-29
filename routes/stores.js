@@ -14,7 +14,7 @@ const projectRouter = require('./projects');
 const router = express.Router();
 
 /** Re-route Resoureces to other routers */
-router.use('/:stotreId/projects', projectRouter);
+router.use('/:storeId/projects', projectRouter);
 
 /** Store Routes */
 router.route('/radius/:zipcode/:distance').get(getStoreByRadius);
