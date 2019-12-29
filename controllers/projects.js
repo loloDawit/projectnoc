@@ -2,14 +2,19 @@ const Project = require('../models/Project');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
-exports.getProjects = asyncHandler(async (req, res, body) => {
+// @desc        GET ProjectS
+// @route       GET /api/v1/projects
+// @route       GET /api/v1/stores/:storeId/projects
+// @access      Public
+exports.getProjects = asyncHandler(async (req, res, next) => {
   let query;
-  console.log(req.params.storeId);
-
   if (req.params.storeId) {
     query = Project.find({ store: req.params.storeId });
   } else {
-    query = Project.find();
+    query = Project.find().populate({
+      path: 'store',
+      select: 'name description engineers'
+    });
   }
   const projects = await query;
 
