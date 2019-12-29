@@ -109,7 +109,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
  * * Access      Private
  */
 exports.deleteProject = asyncHandler(async (req, res, next) => {
-  const project = await Project.findByIdAndDelete(req.params.id);
+  const project = await Project.findByIdAndRemove(req.params.id);
   if (!project) {
     return next(
       new ErrorResponse(`Project not found with an id of ${req.params.id}`, 404)
