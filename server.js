@@ -1,8 +1,10 @@
 //Main Entry Point
 const express = require('express');
+const path = require('path');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
+const fileupload = require('express-fileupload');
 // Load ENV Variables
 dotenv.config({ path: './config/config.env' });
 // Middleware
@@ -23,6 +25,11 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+// File upload for photos
+app.use(fileupload());
+
+// Use static file and folders
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Mount routers
 app.use('/api/v1/stores', stores);
