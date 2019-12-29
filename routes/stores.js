@@ -7,8 +7,16 @@ const {
   deleteStore,
   getStoreByRadius
 } = require('../controllers/stores');
+/** Other Resources Routes */
+const projectRouter = require('./projects');
+
+/** Initialize Router */
 const router = express.Router();
 
+/** Re-route Resoureces to other routers */
+router.use('/:stotreId/projects', projectRouter);
+
+/** Store Routes */
 router.route('/radius/:zipcode/:distance').get(getStoreByRadius);
 router
   .route('/')
