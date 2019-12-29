@@ -1,13 +1,14 @@
 const Store = require('../models/Store');
+const path = require('path');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const geocoder = require('../utils/geocoder');
 /**
  *   getStores
- * 
+ *
  * * Description Get all Stores
  * * Route       Get /api/v1/stores
- * * Access      Public 
+ * * Access      Public
  */
 exports.getStores = asyncHandler(async (req, res, next) => {
   const reqQuery = { ...req.query };
@@ -136,7 +137,53 @@ exports.deleteStore = asyncHandler(async (req, res, next) => {
     data: {}
   });
 });
-
+// uploadStorePhoto
+// @desc        upload a store image
+// @route       PUT /api/v1/stores/:id
+// @access      Private
+exports.uploadStorePhoto = asyncHandler(async (req, res, next) => {
+  const store = await Store.findById(req.params.id);
+  if (!store) {
+    return next(
+      new ErrorResponse(`Store not found with the id of ${req.params.id}`, 404)
+    );
+  }
+  if (!req.files) {
+    return next(new ErrorResponse('Please upload a file'));
+  }
+  const file = req.files.file;
+  // validate the files if it;s an image
+  // image files png, img, jpeg starts with image/
+  if (!file.mimetype.startsWith('image')) {
+    return next(
+      new ErrorResponse(
+        'File uploaded is not an image, please upload an image',
+        404
+      )
+    );
+  }
+  // Limit the size of the image to be upload
+  if (file.size > process.env.MAX_FILE_UPLOAD) {
+    return new ErrorResponse(
+      `Please upload an image less than ${env.MAX_FILE_UPLOAD}`
+    );
+  }
+  // add custom image file name
+  file.name = `img_${store._id}${path.parse(file.name).ext}`;
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async error => {
+    if (error) {
+      console.error(error);
+      return next(new ErrorResponse('oops something happed', 500));
+    }
+    await Store.findByIdAndUpdate(req.params.id, {
+      photo: file.name
+    });
+    res.status(200).json({
+      success: true,
+      data: `Image ${file.name} has been successfully added.`
+    });
+  });
+});
 // @desc        Get a Store within a radius
 // @route       GET /api/v1/stores/radius/:zipcode/:id
 // @access      Private
