@@ -5,7 +5,8 @@ const {
   updateStore,
   createStore,
   deleteStore,
-  getStoreByRadius
+  getStoreByRadius,
+  uploadStorePhoto
 } = require('../controllers/stores');
 /** Other Resources Routes */
 const projectRouter = require('./projects');
@@ -22,7 +23,7 @@ router
   .route('/')
   .get(getStores)
   .post(createStore);
-
+router.route('/:id/photo').put(uploadStorePhoto)
 router
   .route('/:id')
   .get(getStore)
