@@ -75,7 +75,7 @@ const StoreSchema = new mongoose.Schema(
       min: [1, 'Rating must be at least 1'],
       max: [10, 'Rating must not be more than 10']
     },
-    averageRevenue: Number,
+    averageCost: Number,
     photo: {
       type: String,
       default: 'no-photo.jpg'
