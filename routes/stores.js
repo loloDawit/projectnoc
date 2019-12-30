@@ -8,6 +8,10 @@ const {
   getStoreByRadius,
   uploadStorePhoto
 } = require('../controllers/stores');
+
+const Store = require('../models/Store');
+const filterQuery = require('../middleware/filter');
+
 /** Other Resources Routes */
 const projectRouter = require('./projects');
 
@@ -21,9 +25,9 @@ router.use('/:storeId/projects', projectRouter);
 router.route('/radius/:zipcode/:distance').get(getStoreByRadius);
 router
   .route('/')
-  .get(getStores)
+  .get(filterQuery(Store, 'projects'), getStores)
   .post(createStore);
-router.route('/:id/photo').put(uploadStorePhoto)
+router.route('/:id/photo').put(uploadStorePhoto);
 router
   .route('/:id')
   .get(getStore)
