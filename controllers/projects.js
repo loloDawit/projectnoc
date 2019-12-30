@@ -12,22 +12,16 @@ const asyncHandler = require('../middleware/async');
  * * Access      Public
  */
 exports.getProjects = asyncHandler(async (req, res, next) => {
-  let query;
   if (req.params.storeId) {
-    query = Project.find({ store: req.params.storeId });
-  } else {
-    query = Project.find().populate({
-      path: 'store',
-      select: 'name description engineers'
+    const projects = await Project.find({ store: req.params.storeId });
+    return res.status(200).json({
+      success: true,
+      total_project: projects.length,
+      data: projects
     });
+  } else {
+    res.status(200).json(res.filterQuery);
   }
-  const projects = await query;
-
-  res.status(200).json({
-    success: true,
-    total_project: projects.length,
-    data: projects
-  });
 });
 /**
  **  getProject
@@ -109,7 +103,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
  * * Access      Private
  */
 exports.deleteProject = asyncHandler(async (req, res, next) => {
-  const project = await Project.findByIdAndRemove(req.params.id);
+  const project = await Project.findByIdAndDelete(req.params.id);
   if (!project) {
     return next(
       new ErrorResponse(`Project not found with an id of ${req.params.id}`, 404)
