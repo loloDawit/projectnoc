@@ -4,8 +4,6 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const geocoder = require('../utils/geocoder');
 /**
- *   getStores
- *
  * * Description Get all Stores
  * * Route       Get /api/v1/stores
  * * Access      Public
@@ -73,10 +71,11 @@ exports.getStores = asyncHandler(async (req, res, next) => {
     data: stores
   });
 });
-
-// @desc        Get a Single Store
-// @route       Get /api/v1/stores/:id
-// @access      Public
+/**
+ * * Description Get a single store
+ * * Route       GET /api/v1/stores/:id
+ * * Access      Public
+ */
 exports.getStore = asyncHandler(async (req, res, next) => {
   const store = await Store.findById(req.params.id);
   if (!store) {
@@ -89,10 +88,11 @@ exports.getStore = asyncHandler(async (req, res, next) => {
     data: store
   });
 });
-
-// @desc        Create new Store
-// @route       POST /api/v1/stores
-// @access      Private
+/**
+ * * Description Create a new store
+ * * Route       POST /api/v1/stores
+ * * Access      Private
+ */
 exports.createStore = asyncHandler(async (req, res, next) => {
   const store = await Store.create(req.body);
 
@@ -101,10 +101,11 @@ exports.createStore = asyncHandler(async (req, res, next) => {
     data: store
   });
 });
-
-// @desc        Upadte a  Store
-// @route       PUT /api/v1/stores/:id
-// @access      Private
+/**
+ * * Description Update a store
+ * * Route       PUT /api/v1/stores/:id
+ * * Access      Private
+ */
 exports.updateStore = asyncHandler(async (req, res, next) => {
   const store = await Store.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -120,10 +121,11 @@ exports.updateStore = asyncHandler(async (req, res, next) => {
     data: store
   });
 });
-
-// @desc        Delete a  Store
-// @route       DELETE /api/v1/stores/:id
-// @access      Private
+/**
+ * * Description Delete a store
+ * * Route       PUT /api/v1/stores/:id
+ * * Access      Private
+ */
 exports.deleteStore = asyncHandler(async (req, res, next) => {
   const store = await Store.findById(req.params.id);
   if (!store) {
@@ -137,10 +139,11 @@ exports.deleteStore = asyncHandler(async (req, res, next) => {
     data: {}
   });
 });
-// uploadStorePhoto
-// @desc        upload a store image
-// @route       PUT /api/v1/stores/:id
-// @access      Private
+/**
+ * * Description Upload a store image
+ * * Route       PUT /api/v1/stores/:id/photo
+ * * Access      Private
+ */
 exports.uploadStorePhoto = asyncHandler(async (req, res, next) => {
   const store = await Store.findById(req.params.id);
   if (!store) {
@@ -184,9 +187,11 @@ exports.uploadStorePhoto = asyncHandler(async (req, res, next) => {
     });
   });
 });
-// @desc        Get a Store within a radius
-// @route       GET /api/v1/stores/radius/:zipcode/:id
-// @access      Private
+/**
+ * * Description Get a store within a given radius using the zip code as a reference
+ * * Route       GET /api/v1/stores/radius/:zipcode/:id
+ * * Access      Public
+ */
 exports.getStoreByRadius = asyncHandler(async (req, res, next) => {
   const { zipcode, distance } = req.params;
   // Get the latitude and longitude from the geocoder
