@@ -12,6 +12,8 @@ const errorHandler = require('./middleware/error');
 // Router files
 const stores = require('./routes/stores');
 const projects = require('./routes/projects');
+const auth = require('./routes/authenticate');
+
 const connectDB = require('./config/db');
 
 // Connect to database
@@ -34,6 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Mount routers
 app.use('/api/v1/stores', stores);
 app.use('/api/v1/projects', projects);
+app.use('/api/v1/auth', auth);
 
 const PORT = process.env.PORT;
 
