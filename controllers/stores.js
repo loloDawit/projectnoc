@@ -34,12 +34,12 @@ exports.getStores = asyncHandler(async (req, res, next) => {
     const fields = req.query.select.split(',').join(' ');
     query = query.select(fields);
   }
-  // SORT query by
+  // SORT query by date
   if (req.query.sort) {
     const sortBy = req.query.select.split(',').join(' ');
     query = query.sort(sortBy);
   } else {
-    query = query.sort('-establishedat');
+    query = query.sort('-createdAt');
   }
   // Add pagination
   const page = parseInt(req.query.page, 10) || 1;
