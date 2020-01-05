@@ -20,10 +20,10 @@ router
     }),
     getProjects
   )
-  .post(protect, authorize('admin'), createProject);
+  .post(protect, authorize('admin', 'owner'), createProject);
 router
   .route('/:id')
   .get(getProject)
-  .put(protect, authorize('admin'), updateProject)
-  .delete(protect, authorize('admin'), deleteProject);
+  .put(protect, authorize('admin', 'owner'), updateProject)
+  .delete(protect, authorize('admin', 'owner'), deleteProject);
 module.exports = router;
