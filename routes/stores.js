@@ -27,12 +27,12 @@ router.route('/radius/:zipcode/:distance').get(getStoreByRadius);
 router
   .route('/')
   .get(filterQuery(Store, 'projects'), getStores)
-  .post(protect, authorize('admin'), createStore);
-router.route('/:id/photo').put(protect, authorize('admin'), uploadStorePhoto);
+  .post(protect, authorize('admin','owner'), createStore);
+router.route('/:id/photo').put(protect, authorize('admin','owner'), uploadStorePhoto);
 router
   .route('/:id')
   .get(getStore)
-  .put(protect, authorize('admin'), updateStore)
-  .delete(protect, authorize('admin'), deleteStore);
+  .put(protect, authorize('admin','owner'), updateStore)
+  .delete(protect, authorize('admin','owner'), deleteStore);
 
 module.exports = router;
