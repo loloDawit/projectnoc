@@ -55,4 +55,10 @@ UserSchema.methods.getSignedJSONWebToken = function() {
     expiresIn: process.env.JWT_EXPIRE_DATE
   });
 };
+/**
+ * ! Match user's password saved in the database which is already hashed
+ */
+UserSchema.methods.validateHashedPassword = async function(password) {
+  return await encrypt.compare(password, this.password);
+};
 module.exports = mongoose.model('User', UserSchema);
