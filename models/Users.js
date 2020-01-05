@@ -69,7 +69,7 @@ UserSchema.methods.validateHashedPassword = async function(password) {
 /**
  * ! Reset password
  */
-UserSchema.methods.getPasswordResetToken = async function() {
+UserSchema.methods.getPasswordResetToken = function() {
   const resetToken = crypto.randomBytes(20).toString('hex'); // generate token
   // hash it
   this.resetPasswordToken = crypto
