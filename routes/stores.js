@@ -11,7 +11,7 @@ const {
 
 const Store = require('../models/Store');
 const filterQuery = require('../middleware/filter');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 /** Other Resources Routes */
 const projectRouter = require('./projects');
@@ -27,12 +27,12 @@ router.route('/radius/:zipcode/:distance').get(getStoreByRadius);
 router
   .route('/')
   .get(filterQuery(Store, 'projects'), getStores)
-  .post(protect, createStore);
-router.route('/:id/photo').put(protect, uploadStorePhoto);
+  .post(protect, authorize('admin'), createStore);
+router.route('/:id/photo').put(protect, authorize('admin'), uploadStorePhoto);
 router
   .route('/:id')
   .get(getStore)
-  .put(protect, updateStore)
-  .delete(protect, deleteStore);
+  .put(protect, authorize('admin'), updateStore)
+  .delete(protect, authorize('admin'), deleteStore);
 
 module.exports = router;
