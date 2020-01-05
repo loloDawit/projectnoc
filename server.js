@@ -14,6 +14,7 @@ const errorHandler = require('./middleware/error');
 const stores = require('./routes/stores');
 const projects = require('./routes/projects');
 const auth = require('./routes/authenticate');
+const users = require('./routes/admin');
 
 const connectDB = require('./config/db');
 
@@ -40,7 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/v1/stores', stores);
 app.use('/api/v1/projects', projects);
 app.use('/api/v1/auth', auth);
-
+app.use('/api/v1/users', users);
 const PORT = process.env.PORT;
 
 app.use(errorHandler);
