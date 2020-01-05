@@ -34,6 +34,18 @@ exports.getStore = asyncHandler(async (req, res, next) => {
  * * Access      Private
  */
 exports.createStore = asyncHandler(async (req, res, next) => {
+  // added user
+  req.body.user = req.user.id;
+  const checkPublished = await Store.findOne({ user: req.user.id });
+  // if already published
+  if (checkPublished && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `The user with ID ${req.user.id} has already published a store.`,
+        400
+      )
+    );
+  }
   const store = await Store.create(req.body);
 
   res.status(200).json({
@@ -47,15 +59,29 @@ exports.createStore = asyncHandler(async (req, res, next) => {
  * * Access      Private
  */
 exports.updateStore = asyncHandler(async (req, res, next) => {
-  const store = await Store.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
+  let store = await Store.findById(req.params.id);
   if (!store) {
     return next(
       new ErrorResponse(`Store not found with the id of ${req.params.id}`, 404)
     );
   }
+  console.log('printing....', store.user.id);
+
+  // Check ownership
+  if (store.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.params.id} is not authorized to update this store`,
+        401
+      )
+    );
+  }
+  // finally
+  store = await Store.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
+
   res.status(200).json({
     success: true,
     data: store
@@ -71,6 +97,15 @@ exports.deleteStore = asyncHandler(async (req, res, next) => {
   if (!store) {
     return next(
       new ErrorResponse(`Store not found with the id of ${req.params.id}`, 404)
+    );
+  }
+  // Check ownership
+  if (store.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.params.id} is not authorized to delete this store`,
+        401
+      )
     );
   }
   store.remove();
@@ -89,6 +124,15 @@ exports.uploadStorePhoto = asyncHandler(async (req, res, next) => {
   if (!store) {
     return next(
       new ErrorResponse(`Store not found with the id of ${req.params.id}`, 404)
+    );
+  }
+  // Check ownership
+  if (store.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.params.id} is not authorized to update this store`,
+        401
+      )
     );
   }
   if (!req.files) {
