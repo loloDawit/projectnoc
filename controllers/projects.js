@@ -57,12 +57,24 @@ exports.getProject = asyncHandler(async (req, res, next) => {
  */
 exports.createProject = asyncHandler(async (req, res, next) => {
   req.body.store = req.params.storeId;
+  req.body.user = req.user.id;
+
   const store = await Store.findById(req.params.storeId);
   if (!store) {
     return next(
       new ErrorResponse(
         `Store not found with an id of ${req.params.storeId}`,
         404
+      )
+    );
+  }
+
+  // Check ownership
+  if (store.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to create a project to store ${store._id} `,
+        401
       )
     );
   }
@@ -81,15 +93,25 @@ exports.createProject = asyncHandler(async (req, res, next) => {
  * * Access      Private
  */
 exports.updateProject = asyncHandler(async (req, res, next) => {
-  const project = await Project.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
+  let project = await Project.findById(req.params.id);
   if (!project) {
     return next(
       new ErrorResponse(`Project not found with an id of ${req.params.id}`, 404)
     );
   }
+  // Check ownership
+  if (project.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to update a project at store ${project._id} `,
+        401
+      )
+    );
+  }
+  project = await Project.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
   res.status(200).json({
     success: true,
     data: project
@@ -103,12 +125,22 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
  * * Access      Private
  */
 exports.deleteProject = asyncHandler(async (req, res, next) => {
-  const project = await Project.findByIdAndDelete(req.params.id);
+  const project = await Project.findById(req.params.id);
   if (!project) {
     return next(
       new ErrorResponse(`Project not found with an id of ${req.params.id}`, 404)
     );
   }
+  // Check ownership
+  if (project.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to delete a project at store ${project._id} `,
+        401
+      )
+    );
+  }
+  await project.remove();
   res.status(200).json({
     success: true,
     data: {}
