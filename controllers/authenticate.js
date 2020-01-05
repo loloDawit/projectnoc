@@ -57,6 +57,40 @@ exports.signInUser = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
+/**
+ * @description Get current logged in user
+ * @route       POST /api/v1/auth/admin
+ * @access      Private
+ */
+exports.getAdmin = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  res.status(200).json({
+    success: true,
+    data: user
+  });
+});
+/**
+ * @description Reset forgot password
+ * @route       POST /api/v1/auth/resetpassword
+ * @access      Public
+ */
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(
+      new ErrorResponse(`User with email '${req.body.email}' not found!`, 404)
+    );
+  }
+  const resetToken = user.getPasswordResetToken();
+  await user.save({
+    validateBeforeSave: false
+  });
+  res.status(200).json({
+    success: true,
+    data: user
+  });
+});
+
 // Get token and create cookie
 const sendTokenResponse = (user, statusCode, response) => {
   const token = user.getSignedJSONWebToken();
@@ -77,16 +111,3 @@ const sendTokenResponse = (user, statusCode, response) => {
       token
     });
 };
-
-/**
- * @description Get current logged in user
- * @route       POST /api/v1/auth/admin
- * @access      Private
- */
-exports.getAdmin = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-  res.status(200).json({
-    success: true,
-    data: user
-  });
-});
