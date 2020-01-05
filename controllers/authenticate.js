@@ -6,7 +6,7 @@ const asyncHandler = require('../middleware/async');
 
 /**
  * * Description    Register user
- * * Route          GET /api/v1/auth/register
+ * * Route          POST /api/v1/auth/register
  * * Access         Public
  */
 exports.registerUser = asyncHandler(async (req, res, next) => {
@@ -19,11 +19,68 @@ exports.registerUser = asyncHandler(async (req, res, next) => {
     password,
     role
   });
-  // Create token
-  const token = user.getSignedJSONWebToken();
+  // Create token and send
+  sendTokenResponse(user, 200, res);
 
   res.status(200).json({
     success: true,
     token
   });
 });
+/**
+ * * Description    Sign in registered users using the token
+ * * Route          POST /api/v1/auth/login
+ * * Access         Private
+ */
+exports.signInUser = asyncHandler(async (req, res, next) => {
+  const { email, password } = req.body;
+  // check if email and password is right
+  if (!email || !password) {
+    return next(
+      new ErrorResponse(
+        'Validation failed, please check you have the correct password and email'
+      ),
+      400
+    );
+  }
+  const user = await User.findOne({ email: email }).select('+password');
+  if (!user) {
+    return next(
+      new ErrorResponse('Validation failed, Invalid password/email'),
+      401
+    );
+  }
+  // validate the password
+  const _comparePassword = await user.validateHashedPassword(password);
+  if (!_comparePassword) {
+    return next(
+      new ErrorResponse('Validation failed, Invalid password/email'),
+      401
+    );
+  }
+  //Create token and send
+  sendTokenResponse(user, 200, res);
+
+  res.status(200).json({
+    success: true,
+    token
+  });
+});
+
+// Get token and create cookie
+const sendTokenResponse = (user, statusCode, response) => {
+  const token = user.getSignedJSONWebToken();
+  const options = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRE_DATE * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true
+  };
+  response
+    .status(statusCode)
+    .cookie('token', token, options)
+    .json({
+      success: true,
+      token
+    });
+};
