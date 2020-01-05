@@ -8,7 +8,7 @@ const {
 } = require('../controllers/projects');
 const Project = require('../models/Project');
 const filterQuery = require('../middleware/filter');
-
+const { protect } = require('../middleware/auth');
 const router = express.Router({ mergeParams: true });
 
 router
@@ -20,10 +20,10 @@ router
     }),
     getProjects
   )
-  .post(createProject);
+  .post(protect, createProject);
 router
   .route('/:id')
   .get(getProject)
-  .put(updateProject)
-  .delete(deleteProject);
+  .put(protect, updateProject)
+  .delete(protect, deleteProject);
 module.exports = router;
