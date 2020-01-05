@@ -21,11 +21,6 @@ exports.registerUser = asyncHandler(async (req, res, next) => {
   });
   // Create token and send
   sendTokenResponse(user, 200, res);
-
-  res.status(200).json({
-    success: true,
-    token
-  });
 });
 /**
  * * Description    Sign in registered users using the token
@@ -60,11 +55,6 @@ exports.signInUser = asyncHandler(async (req, res, next) => {
   }
   //Create token and send
   sendTokenResponse(user, 200, res);
-
-  res.status(200).json({
-    success: true,
-    token
-  });
 });
 
 // Get token and create cookie
@@ -76,6 +66,9 @@ const sendTokenResponse = (user, statusCode, response) => {
     ),
     httpOnly: true
   };
+  if (process.env.NODE_ENV === 'production') {
+    options.sercure = true;
+  }
   response
     .status(statusCode)
     .cookie('token', token, options)
@@ -84,3 +77,12 @@ const sendTokenResponse = (user, statusCode, response) => {
       token
     });
 };
+
+/**
+ * @description Get current logged in user
+ * @route       POST /api/v1/auth/admin
+ * @access      Private
+ */
+exports.getAdmin = asyncHandler(async (req, res, next) => {
+  
+});
