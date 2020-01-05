@@ -36,6 +36,11 @@ const ProjectSchema = mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'Store',
     required: true
+  },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required: true
   }
 });
 /**
