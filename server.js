@@ -15,7 +15,7 @@ const stores = require('./routes/stores');
 const projects = require('./routes/projects');
 const auth = require('./routes/authenticate');
 const users = require('./routes/admin');
-
+const reviews = require('./routes/reviews');
 const connectDB = require('./config/db');
 
 // Connect to database
@@ -42,6 +42,7 @@ app.use('/api/v1/stores', stores);
 app.use('/api/v1/projects', projects);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/users', users);
+app.use('/api/v1/reviews', reviews);
 const PORT = process.env.PORT;
 
 app.use(errorHandler);
